@@ -4,6 +4,7 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 const session = require('express-session')
+const RedisStore = require('connect-redis')(session)
 
 // var indexRouter = require('./routes/index')
 // var usersRouter = require('./routes/users')
@@ -29,11 +30,19 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use(cookieParser())
 
+const redisClient = require('./db/redis.js')
+const sessionStore = new RedisStore({
+  client: redisClient,
+})
 app.use(
   session({
-    path: '/', // 默认配置
-    httpOnly: true, // 默认配置
-    maxAge: 3600 * 24 * 60 * 60 * 1000,
+    secret: 'Bjs#4545_',
+    cookie: {
+      path: '/', // 默认配置
+      httpOnly: true, // 默认配置
+      maxAge: 3600 * 24 * 60 * 60 * 1000,
+    },
+    store: sessionStore,
   })
 )
 
